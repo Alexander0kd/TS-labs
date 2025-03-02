@@ -1,0 +1,34 @@
+[
+    {
+        "id": 1,
+        "img": "https://place-hold.it/200x200",
+        "name": "Роман",
+        "shortName": "novel",
+        "description": "Сучасний роман відомого письменника",
+        "price": 150
+    },
+    {
+        "id": 2,
+        "img": "https://place-hold.it/200x200",
+        "name": "Детектив",
+        "shortName": "detective",
+        "description": "Захоплюючий детектив",
+        "price": 200
+    },
+    {
+        "id": 3,
+        "img": "https://place-hold.it/200x200",
+        "name": "Поезія",
+        "shortName": "poetry",
+        "description": "Збірка вибраних віршів",
+        "price": 100
+    },
+    {
+        "id": 4,
+        "img": "https://place-hold.it/200x200",
+        "name": "Наукова",
+        "shortName": "science",
+        "description": "Наукова книга про природу",
+        "price": 250
+    }
+]

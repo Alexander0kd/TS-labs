@@ -1,0 +1,34 @@
+[
+    {
+        "id": 1,
+        "img": "https://place-hold.it/200x200",
+        "name": "Футболка",
+        "shortname": "tshirt",
+        "description": "Чоловіча футболка, розмір M",
+        "price": 300
+    },
+    {
+        "id": 2,
+        "img": "https://place-hold.it/200x200",
+        "name": "Джинси",
+        "shortname": "jeans",
+        "description": "Жіночі джинси, розмір S",
+        "price": 500
+    },
+    {
+        "id": 3,
+        "img": "https://place-hold.it/200x200",
+        "name": "Кросівки",
+        "shortname": "sneakers",
+        "description": "Чоловічі кросівки, розмір 42",
+        "price": 700
+    },
+    {
+        "id": 4,
+        "img": "https://place-hold.it/200x200",
+        "name": "Плаття",
+        "shortname": "dress",
+        "description": "Жіноче плаття, розмір M",
+        "price": 1000
+    }
+]

@@ -1,0 +1,33 @@
+{
+    "name": "lab3",
+    "version": "1.0.0",
+    "description": "3 Лаба by Kademskyi Alexander",
+    "main": "dist/index.html",
+    "scripts": {
+        "build": "npm run clean && tsc && copyfiles -u 1 \"src/**/*.html\" \"src/**/*.json\" \"src/**/*.css\" dist/",
+        "start": "npm run build && live-server dist",
+        "dev": "tsc --watch",
+        "clean": "rimraf dist",
+        "lint": "eslint \"src/**/*.ts\" --fix"
+    },
+    "devDependencies": {
+        "copyfiles": "^2.4.1",
+        "live-server": "^1.2.2",
+        "rimraf": "^5.0.0",
+        "typescript": "^5.4.0",
+        "prettier": "^3.3.3",
+        "prettier-eslint": "^16.3.0",
+        "eslint": "8.57.0",
+        "eslint-config-prettier": "^9.1.0",
+        "eslint-plugin-prettier": "^5.2.1",
+        "@typescript-eslint/eslint-plugin": "7.11.0",
+        "@typescript-eslint/parser": "7.11.0",
+        "@angular-eslint/builder": "18.3.0",
+        "@angular-eslint/eslint-plugin": "18.3.0",
+        "@angular-eslint/eslint-plugin-template": "18.3.0",
+        "@angular-eslint/schematics": "18.3.0",
+        "@angular-eslint/template-parser": "18.3.0"
+    },
+    "type": "module",
+    "author": "Kademskyi Alexander"
+}
