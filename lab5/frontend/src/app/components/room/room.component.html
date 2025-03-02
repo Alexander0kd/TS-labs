@@ -1,0 +1,45 @@
+<div class="room-container">
+    <div *ngIf="isLoading" class="loading">Loading room...</div>
+
+    <div *ngIf="error" class="error">
+        {{ error }}
+        <button class="exit-button" (click)="exitRoom()">Go Back to Home</button>
+    </div>
+
+    <div *ngIf="!isLoading && !error && room" class="room-content">
+        <div class="room-header">
+            <h1>{{ room.settings.name }}</h1>
+            <div class="room-actions">
+                <button *ngIf="isAdmin" (click)="toggleSettings()" class="settings-button">
+                    {{ isSettingsOpen ? 'Close Settings' : 'Settings' }}
+                </button>
+                <button (click)="exitRoom()" class="exit-button">Exit Room</button>
+            </div>
+        </div>
+
+        <div class="room-layout">
+            <div class="content-area">
+                Video
+                <!-- <app-content-view
+                    [contentUrl]="room.contentUrl"
+                    [canChange]="isAdmin() || room.settings.allowContentChangeByUsers"
+                    (urlChange)="updateContentUrl($event)"></app-content-view> -->
+            </div>
+
+            <div class="sidebar">
+                Sidebar
+                <!-- <app-participant-list
+                    [participants]="room.participants"
+                    [currentUserId]="getCurrentUserId()"></app-participant-list> -->
+
+                <!-- <app-chat *ngIf="room.settings.allowChat" [messages]="room.messages" [roomId]="room.id"></app-chat> -->
+            </div>
+        </div>
+
+        Settings
+        <!-- <app-room-settings
+            *ngIf="isSettingsOpen && isAdmin()"
+            [settings]="room.settings"
+            [roomId]="room.id"></app-room-settings> -->
+    </div>
+</div>

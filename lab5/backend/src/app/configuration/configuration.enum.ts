@@ -1,0 +1,6 @@
+export enum CONFIG {
+    NODE_ENV = 'NODE_ENV',
+
+    PORT = 'PORT',
+    ALLOWED_ORIGINS = 'ALLOWED_ORIGINS',
+}
