@@ -1,0 +1,59 @@
+.video-container{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+
+    overflow-x: hidden;
+    overflow-y: auto;
+
+    background-color: transparent;
+}
+youtube-player {
+    display: block;
+    aspect-ratio: 16/9;
+    width: 100%;
+
+    &.unclickable {
+        pointer-events: none !important;
+    }
+
+    ::ng-deep iframe {
+        width: 100%;
+        height: 100%;
+
+        display: block;
+        aspect-ratio: 16/9;
+
+        border-left: 2px solid gray;
+        border-right: 2px solid gray;
+    }
+}
+.video-header{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+
+    width: 100%;
+
+    background-color: #f9f9f9;
+    padding: 8px;
+    border: 2px solid gray;
+}
+.video-input{
+    padding: 0 4px;
+    width: 100%;
+}
+.video-button{
+    padding: 0 16px;
+    height: 100%;
+    width: fit-content;
+    background-color: #f9f9f9;
+    border: 1px solid gray;
+
+    transition: all .2s;
+    &:hover {
+        background-color: #e5e5e5;
+    }
+}

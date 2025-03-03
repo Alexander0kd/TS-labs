@@ -1,0 +1,25 @@
+mat-dialog-content {
+    min-width: 500px;
+}
+
+h2 {
+    margin-top: 0;
+}
+
+mat-dialog-actions {
+    gap: 8px;
+}
+
+@media (max-width: 600px) {
+    mat-dialog-content {
+        min-width: 200px;
+    }
+}
+
+.form-field {
+    margin-bottom: 1rem;
+}
+
+.full-width {
+    width: 100%;
+}

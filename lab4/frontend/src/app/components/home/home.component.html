@@ -1,0 +1,43 @@
+<div class="home-container">
+    <div class="header">
+        <h1 class="header-title">ViewTogether</h1>
+        <p class="header-subtitle">Create or join a room to watch web content with friends - no registration required!</p>
+    </div>
+
+    <div class="create-room-container">
+        <h2 class="form-title">Create a New Room</h2>
+
+        <form [formGroup]="createRoomForm" (ngSubmit)="onSubmit()">
+            <div class="form-group">
+                <label class="form-label" for="roomName">Room Name</label>
+                <input
+                    class="form-input"
+                    type="text"
+                    id="roomName"
+                    formControlName="roomName"
+                    placeholder="Enter a name for your room" />
+                <div
+                    class="error"
+                    *ngIf="createRoomForm.get('roomName')?.invalid && createRoomForm.get('roomName')?.touched">
+                    Room name is required (minimum 3 characters)
+                </div>
+            </div>
+
+            <div class="form-group checkbox">
+                <input class="form-checkbox" type="checkbox" id="isPublic" formControlName="isPublic" />
+                <label class="form-label" for="isPublic">Make this room public (anyone can join)</label>
+            </div>
+
+            <div class="error" *ngIf="error">{{ error }}</div>
+
+            <button class="form-button" type="submit" [disabled]="createRoomForm.invalid || isCreating">
+                {{ isCreating ? 'Creating...' : 'Create Room' }}
+            </button>
+        </form>
+    </div>
+
+    <div class="join-room-container">
+        <h2 class="join-title">or</h2>
+        <button class="form-button secondary" (click)="navigateToRoomList()">Join an Existing Room</button>
+    </div>
+</div>

@@ -1,0 +1,28 @@
+<div class="room-container">
+    <div *ngIf="isLoading" class="loading">Loading room...</div>
+
+    <div *ngIf="error" class="error">
+        {{ error }}
+        <button class="exit-button" (click)="leaveRoom()">Go Back to Home</button>
+    </div>
+
+    <div *ngIf="!isLoading && !error && room" class="room-content">
+        <div class="room-header">
+            <h1>{{ room.settings.name }}</h1>
+            <div class="room-actions">
+                <button *ngIf="isAdmin" (click)="openSettings()" class="settings-button">Settings</button>
+                <button (click)="leaveRoom()" class="exit-button">Exit Room</button>
+            </div>
+        </div>
+
+        <div class="room-layout">
+            <div class="content-area">
+                <app-video [isAdmin]="isAdmin" [room]="room"></app-video>
+            </div>
+
+            <div class="sidebar" *ngIf="userId">
+                <app-sidebar [room]="room" [userId]="userId" [showChat]="room.settings.allowChat"></app-sidebar>
+            </div>
+        </div>
+    </div>
+</div>

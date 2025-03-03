@@ -1,0 +1,33 @@
+<h2 mat-dialog-title>Settings</h2>
+
+<mat-dialog-content>
+    <form [formGroup]="settingsForm">
+        <div class="form-field">
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Назва кімнати</mat-label>
+                <input matInput formControlName="name" />
+            </mat-form-field>
+        </div>
+
+        <div class="form-field">
+            <mat-checkbox formControlName="allowVideoChange"> Дозволити змінювати відео </mat-checkbox>
+        </div>
+
+        <div class="form-field">
+            <mat-checkbox formControlName="allowChangeUrl"> Дозволити змінювати URL </mat-checkbox>
+        </div>
+
+        <div class="form-field">
+            <mat-checkbox formControlName="allowChat"> Дозволити чат </mat-checkbox>
+        </div>
+
+        <div class="form-field">
+            <mat-checkbox formControlName="isPublic"> Зробити кімнату публічною </mat-checkbox>
+        </div>
+    </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+    <button mat-button (click)="onSave()">Save</button>
+    <button mat-button mat-dialog-close>Close</button>
+</mat-dialog-actions>
