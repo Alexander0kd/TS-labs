@@ -8,8 +8,6 @@ import { AppComponent } from './app.component';
 import { ListComponent } from './components/list/list.component';
 import { RoomComponent } from './components/room/room.component';
 import { HomeComponent } from './components/home/home.component';
-import { WebSocketService } from './services/web-socket/web-socket.service';
-import { RoomService } from './services/room/room.service';
 import { ConnectionService } from './services/connection/connection.service';
 
 import { SettingsComponent } from './components/room/settings/settings.component';
@@ -49,6 +47,6 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
         FontAwesomeModule,
     ],
     bootstrap: [AppComponent],
-    providers: [WebSocketService, RoomService, ConnectionService, provideAnimations()],
+    providers: [ConnectionService, provideAnimations()],
 })
 export class AppModule {}

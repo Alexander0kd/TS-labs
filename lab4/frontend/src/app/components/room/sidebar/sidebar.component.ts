@@ -1,11 +1,10 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { UserRole } from '@app/enums/user-role.enum';
 import { IMessage } from '@app/interfaces/message.interface';
 import { IRoom } from '@app/interfaces/room.interface';
-import { RoomService } from '@app/services/room/room.service';
 import { faPaperPlane } from '@fortawesome/free-solid-svg-icons';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject } from 'rxjs';
 import { v4 as uuid } from 'uuid';
 
 @Component({
@@ -13,7 +12,7 @@ import { v4 as uuid } from 'uuid';
     templateUrl: './sidebar.component.html',
     styleUrl: './sidebar.component.scss',
 })
-export class SidebarComponent implements OnInit, OnDestroy {
+export class SidebarComponent {
     @Input() room!: IRoom;
     @Input() userId: string = '';
     @Input() showChat: boolean = false;
@@ -26,10 +25,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
     chatForm: FormGroup;
     UserRole = UserRole;
 
-    constructor(
-        private roomService: RoomService,
-        private fb: FormBuilder
-    ) {
+    constructor(private fb: FormBuilder) {
         this.chatForm = this.fb.group({
             message: ['', [Validators.required]],
         });
@@ -53,17 +49,6 @@ export class SidebarComponent implements OnInit, OnDestroy {
         }
     }
 
-    ngOnInit(): void {
-        this.roomService
-            .subscribeToMessageEvents()
-            .pipe(takeUntil(this.destroy$))
-            .subscribe({
-                next: (data) => {
-                    this.chatMessages.push(data);
-                },
-            });
-    }
-
     sendMessage(): void {
         if (this.chatForm.valid) {
             const message: IMessage = {
@@ -75,17 +60,10 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
             this.chatMessages.push(message);
             this.chatForm.reset({ message: '' });
-
-            this.roomService.sendMessage(this.room.uuid, message);
         }
     }
 
     get name(): string {
         return `User-${this.userId.substring(0, 5)}`;
-    }
-
-    ngOnDestroy(): void {
-        this.destroy$.next();
-        this.destroy$.complete();
     }
 }
