@@ -69,6 +69,8 @@ export class WebSocketService {
         return this.userId;
     }
 
+    // take = 'ONE' - http.GET
+    // take = 'IDENTITY' - stream.GET
     createTwoSideWSConnection<T, U>(event: string, data: U, listenEvent: string, take: 'ONE' | 'IDENTITY'): Observable<T> {
         return new Observable<T>((observer: Subscriber<T>) => {
             this.send<U>(event, data);

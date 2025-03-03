@@ -94,9 +94,12 @@
 }
 .content-area{
     height: 100%;
-    flex: 6.6;
+    flex: 6.5;
 }
 .sidebar{
     height: 100%;
-    flex: 3.3;
+    flex: 3.5;
+    max-width: 33%;
+
+    max-height: 85vh;
 }

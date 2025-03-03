@@ -1,7 +1,7 @@
 export interface IRoomSettings {
     name: string;
     allowVideoChange: boolean;
-    allowVideoPlayerChange: boolean;
+    allowChangeUrl: boolean;
     allowChat: boolean;
     isPublic: boolean;
 }

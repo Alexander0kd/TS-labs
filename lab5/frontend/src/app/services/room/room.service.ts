@@ -1,11 +1,9 @@
 import { Injectable } from '@angular/core';
 import { WebSocketService } from '../web-socket/web-socket.service';
-// import { IRoom } from '@app/interfaces/room.interface';
-// import { Observable, switchMap } from 'rxjs';
-// import { WS_EVENT } from '@app/mapper/ws-event.mapper';
-// import { IRoomSettings } from '@app/interfaces/room-settings.interface';
-// import { v4 as uuid } from 'uuid';
-// import { IMessage } from '@app/interfaces/message.interface';
+import { Observable } from 'rxjs';
+import { ISyncEvent } from '@app/interfaces/sync-event.interface';
+import { WS_EVENT } from '@app/mapper/ws-event.mapper';
+import { IMessage } from '@app/interfaces/message.interface';
 
 @Injectable({
     providedIn: 'root',
@@ -19,98 +17,73 @@ export class RoomService {
         return this.webSocketService.getUserId();
     }
 
-    // updateContentUrl(url: string): Observable<boolean> {
-    //     const currentRoom = this.currentRoom$.value;
+    // For Admin
+    broadcastVideoSync(roomUUID: string, sync: ISyncEvent): void {
+        this.webSocketService.send<{ roomUUID: string; sync: ISyncEvent }>(WS_EVENT.ROOM.VIDEO_UPDATE, {
+            roomUUID,
+            sync,
+        });
+    }
 
-    //     if (!currentRoom) {
-    //         return of(false);
-    //     }
+    broadcastVideoChange(roomUUID: string, contentUrl: string): void {
+        this.broadcastVideoSync(roomUUID, {
+            action: 'change',
+            isPlaying: false,
+            payload: {
+                currentTime: 0,
+                speed: 1,
+                videoUrl: contentUrl,
+                toAdmin: true,
+            },
+        });
+    }
 
-    //     return new Observable<boolean>((observer) => {
-    //         this.webSocketService.send(WS_EVENT.ROOM.UPDATE_URL, {
-    //             roomId: currentRoom.uuid,
-    //             url,
-    //         });
+    // For User
+    subscribeToVideoEvents(): Observable<ISyncEvent> {
+        return new Observable<ISyncEvent>((observer) => {
+            const subscription = this.webSocketService.listen<ISyncEvent>(WS_EVENT.ROOM.ON_VIDEO_UPDATE).subscribe({
+                next: (response: ISyncEvent) => {
+                    observer.next(response);
+                },
+                error: (error) => {
+                    observer.error(error);
+                },
+            });
 
-    //         const subscription = this.webSocketService.listen<boolean>(WS_EVENT.ROOM.ON_UPDATE_URL).subscribe({
-    //             next: (success) => {
-    //                 observer.next(success);
-    //                 observer.complete();
-    //                 subscription.unsubscribe();
-    //             },
-    //             error: (error) => {
-    //                 observer.error(error);
-    //                 subscription.unsubscribe();
-    //             },
-    //         });
-    //     });
-    // }
+            // Виконується перед відпискою
+            // complete - не спрацює, оскільки ми уже відписались
+            return () => {
+                subscription.unsubscribe();
+                this.webSocketService.stopListening(WS_EVENT.ROOM.ON_VIDEO_UPDATE);
+            };
+        });
+    }
 
-    // updateSettings(settings: Partial<IRoomSettings>): Observable<boolean> {
-    //     const currentRoom = this.currentRoom$.value;
+    // Messages
+    subscribeToMessageEvents(): Observable<IMessage> {
+        return new Observable<IMessage>((observer) => {
+            const subscription = this.webSocketService.listen<IMessage>(WS_EVENT.ROOM.ON_MESSAGE_RECEIVED).subscribe({
+                next: (response: IMessage) => {
+                    observer.next(response);
+                },
+                error: (error) => {
+                    observer.error(error);
+                },
+            });
 
-    //     if (!currentRoom) {
-    //         return of(false);
-    //     }
+            // Виконується перед відпискою
+            // complete - не спрацює, оскільки ми уже відписались
+            return () => {
+                subscription.unsubscribe();
+                this.webSocketService.stopListening(WS_EVENT.ROOM.ON_MESSAGE_RECEIVED);
+            };
+        });
+    }
 
-    //     return new Observable<boolean>((observer) => {
-    //         this.webSocketService.send(WS_EVENT.ROOM.UPDATE_SETTINGS, {
-    //             roomId: currentRoom.uuid,
-    //             settings,
-    //         });
-
-    //         const subscription = this.webSocketService.listen<boolean>(WS_EVENT.ROOM.ON_UPDATE_SETTINGS).subscribe({
-    //             next: (success) => {
-    //                 observer.next(success);
-    //                 observer.complete();
-    //                 subscription.unsubscribe();
-    //             },
-    //             error: (error) => {
-    //                 observer.error(error);
-    //                 subscription.unsubscribe();
-    //             },
-    //         });
-    //     });
-    // }
-
-    // sendMessage(text: string): Observable<boolean> {
-    //     const currentRoom = this.currentRoom$.value;
-
-    //     if (!currentRoom) {
-    //         return of(false);
-    //     }
-
-    //     const userId = this.webSocketService.getUserId();
-    //     const user = currentRoom.users.find((p) => p.uuid === userId);
-
-    //     if (!user) {
-    //         return of(false);
-    //     }
-
-    //     const message: IMessage = {
-    //         uuid: uuid(),
-    //         senderName: user.name,
-    //         content: text,
-    //         timestamp: new Date(),
-    //     };
-
-    //     return new Observable<boolean>((observer) => {
-    //         this.webSocketService.send(WS_EVENT.ROOM.SEND_MESSAGE, {
-    //             roomId: currentRoom.uuid,
-    //             message,
-    //         });
-
-    //         const subscription = this.webSocketService.listen<boolean>(WS_EVENT.ROOM.ON_MESSAGE_SENDED).subscribe({
-    //             next: (success) => {
-    //                 observer.next(success);
-    //                 observer.complete();
-    //                 subscription.unsubscribe();
-    //             },
-    //             error: (error) => {
-    //                 observer.error(error);
-    //                 subscription.unsubscribe();
-    //             },
-    //         });
-    //     });
-    // }
+    sendMessage(roomUUID: string, message: IMessage): void {
+        this.webSocketService.send<{ roomUUID: string; message: IMessage }>(WS_EVENT.ROOM.SEND_MESSAGE, {
+            roomUUID,
+            message,
+        });
+    }
 }

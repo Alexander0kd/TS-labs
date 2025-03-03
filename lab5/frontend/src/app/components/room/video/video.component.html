@@ -1,1 +1,15 @@
-<p>video works!</p>
+<div class="video-container">
+    <div class="video-header" *ngIf="isAdmin || room.settings.allowChangeUrl">
+        <input class="video-input" type="text" #videoInput placeholder="Url..." />
+        <button class="video-button" type="button" (click)="updateVideo(videoInput.value)">Change</button>
+    </div>
+
+    <youtube-player
+        [class.unclickable]="!isAdmin && !room.settings.allowVideoChange"
+        disablePlaceholder
+        [videoId]="playerUrl"
+        [playerVars]="playerVars"
+        (playbackRateChange)="onPlaybackRateChange($event)"
+        (ready)="onPlayerReady($event)"
+        (stateChange)="onPlayerStateChange($event)"></youtube-player>
+</div>

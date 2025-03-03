@@ -1,1 +1,49 @@
-<p>sidebar works!</p>
+<div class="sidebar-container" *ngIf="room">
+    <div class="sidebar-section users-section">
+        <h3 class="section-title">Користувачів - ({{ room.users.length || 0 }})</h3>
+
+        <div class="users-list">
+            <div *ngFor="let user of room.users" class="user-item" [class.current-user]="user.uuid === userId">
+                <div class="user-info">
+                    <div class="user-avatar">
+                        {{ user.name.charAt(0).toUpperCase() }}
+                    </div>
+                    <div class="user-details">
+                        <div class="user-name">{{ user.name }}</div>
+                        <div class="user-role" [class]="getUserRoleClass(user.role)">
+                            {{ getUserRoleLabel(user.role) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div *ngIf="showChat" class="sidebar-section chat-section">
+        <h3 class="section-title">Чат</h3>
+
+        <div class="chat-messages" #chatContainer>
+            <div *ngIf="chatMessages.length === 0" class="empty-chat">Повідомлень ще немає</div>
+
+            <div *ngFor="let msg of chatMessages" class="chat-message" [class.own-message]="msg.senderName === name">
+                <div class="message-header">
+                    <span class="message-author">{{ msg.senderName }}</span>
+                    <span class="message-time">{{ msg.timestamp | date: 'HH:mm' }}</span>
+                </div>
+                <div class="message-content">
+                    {{ msg.content }}
+                </div>
+            </div>
+        </div>
+
+        <form [formGroup]="chatForm" (ngSubmit)="sendMessage()" class="chat-input">
+            <mat-form-field appearance="outline" class="message-field">
+                <mat-label>Повідомлення</mat-label>
+                <input matInput formControlName="message" placeholder="Введіть повідомлення..." />
+            </mat-form-field>
+            <button mat-icon-button type="submit" [disabled]="!chatForm.valid">
+                <fa-icon [icon]="faPaperPlane"></fa-icon>
+            </button>
+        </form>
+    </div>
+</div>

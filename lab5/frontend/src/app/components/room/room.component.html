@@ -17,11 +17,11 @@
 
         <div class="room-layout">
             <div class="content-area">
-                <app-video [room]="room"></app-video>
+                <app-video [isAdmin]="isAdmin" [room]="room"></app-video>
             </div>
 
-            <div class="sidebar">
-                <app-sidebar [room]="room"></app-sidebar>
+            <div class="sidebar" *ngIf="userId">
+                <app-sidebar [room]="room" [userId]="userId" [showChat]="room.settings.allowChat"></app-sidebar>
             </div>
         </div>
     </div>

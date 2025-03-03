@@ -79,6 +79,7 @@ export class ConnectionGateway implements OnGatewayDisconnect {
         if (newRoom) {
             client.emit(WS_EVENT.ROOM.ON_UPDATE, newRoom);
             client.to(body.data.roomId).emit(WS_EVENT.ROOM.ON_UPDATE, newRoom);
+            this.server.to(body.data.roomId).emit(WS_EVENT.ROOM.ON_UPDATE, newRoom);
         }
 
         client.leave(body.data.roomId);

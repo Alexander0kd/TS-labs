@@ -3,6 +3,8 @@ import { IRoom } from '../interfaces/room.interface';
 import { UserRole } from '../enums/user-role.enum';
 import { IUser } from '../interfaces/user.interface';
 import { v4 as uuid } from 'uuid';
+import { ISyncEvent } from '../interfaces/sync-event.interface';
+import { IRoomSettings } from '../interfaces/room-settings.interface';
 
 @Injectable()
 export class RoomService {
@@ -20,11 +22,11 @@ export class RoomService {
             settings: {
                 name: roomName,
                 allowVideoChange: true,
-                allowVideoPlayerChange: true,
+                allowChangeUrl: true,
                 allowChat: true,
                 isPublic: isPublic,
             },
-            contentUrls: [],
+            contentUrl: '',
             users: [user],
         };
 
@@ -80,5 +82,29 @@ export class RoomService {
 
             return room;
         }
+    }
+
+    changeVideoData(roomUUID: string, sync: ISyncEvent): ISyncEvent {
+        const room = this.rooms.get(roomUUID);
+
+        if (room && room.contentUrl !== sync.payload.videoUrl) {
+            room.contentUrl = sync.payload.videoUrl;
+            this.rooms.set(roomUUID, room);
+        }
+
+        return sync;
+    }
+
+    updateRoom(uuid: string, newSettings: IRoomSettings): IRoom | null {
+        const room = this.rooms.get(uuid);
+
+        if (room && JSON.stringify(room.settings) !== JSON.stringify(newSettings)) {
+            room.settings = newSettings;
+            this.rooms.set(uuid, room);
+            return room;
+        }
+
+        console.log('2');
+        return null;
     }
 }

@@ -15,6 +15,8 @@ import { SettingsComponent } from './settings/settings.component';
 export class RoomComponent implements OnDestroy, OnInit {
     private destroy$: Subject<void> = new Subject<void>();
 
+    userId: string | null = null;
+
     room: IRoom | null = null;
     error: string | null = null;
 
@@ -37,6 +39,7 @@ export class RoomComponent implements OnDestroy, OnInit {
             return;
         }
 
+        this.userId = this.connectionService.userId;
         this.joinRoom(roomId);
     }
 
@@ -69,7 +72,13 @@ export class RoomComponent implements OnDestroy, OnInit {
     openSettings(): void {
         if (!this.isAdmin || !this.room) return;
 
-        this.dialog.open(SettingsComponent, { data: this.room });
+        const dialog = this.dialog.open(SettingsComponent, { data: this.room });
+
+        dialog.afterClosed().subscribe((updatedRoom) => {
+            if (updatedRoom && this.room) {
+                this.room.settings = updatedRoom;
+            }
+        });
     }
 
     private checkIsAdmin(): void {
@@ -78,8 +87,7 @@ export class RoomComponent implements OnDestroy, OnInit {
             return;
         }
 
-        const userId = this.connectionService.userId;
-        const user = this.room.users.find((u) => u.uuid === userId);
+        const user = this.room.users.find((u) => u.uuid === this.userId);
 
         this.isAdmin = user ? user.role === UserRole.ADMIN : false;
     }

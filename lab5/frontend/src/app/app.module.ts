@@ -18,6 +18,13 @@ import { SidebarComponent } from './components/room/sidebar/sidebar.component';
 
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
+import { YouTubePlayer } from '@angular/youtube-player';
+
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { provideAnimations } from '@angular/platform-browser/animations';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 @NgModule({
     declarations: [
@@ -29,8 +36,19 @@ import { MatButtonModule } from '@angular/material/button';
         SidebarComponent,
         SettingsComponent,
     ],
-    imports: [BrowserModule, AppRoutingModule, ReactiveFormsModule, MatDialogModule, MatButtonModule],
+    imports: [
+        BrowserModule,
+        AppRoutingModule,
+        ReactiveFormsModule,
+        MatDialogModule,
+        MatButtonModule,
+        YouTubePlayer,
+        MatFormFieldModule,
+        MatInputModule,
+        MatCheckboxModule,
+        FontAwesomeModule,
+    ],
     bootstrap: [AppComponent],
-    providers: [WebSocketService, RoomService, ConnectionService],
+    providers: [WebSocketService, RoomService, ConnectionService, provideAnimations()],
 })
 export class AppModule {}
