@@ -1,29 +1,31 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 import { UserRole } from '@app/enums/user-role.enum';
 import { IRoom } from '@app/interfaces/room.interface';
-import { RoomService } from '@app/services/room/room.service';
-import { WebSocketService } from '@app/services/web-socket/web-socket.service';
-import { Subscription } from 'rxjs';
+import { ConnectionService } from '@app/services/connection/connection.service';
+import { Subject, takeUntil } from 'rxjs';
+import { SettingsComponent } from './settings/settings.component';
 
 @Component({
     selector: 'app-room',
     templateUrl: './room.component.html',
     styleUrl: './room.component.scss',
 })
-export class RoomComponent implements OnInit, OnDestroy {
+export class RoomComponent implements OnDestroy, OnInit {
+    private destroy$: Subject<void> = new Subject<void>();
+
     room: IRoom | null = null;
     error: string | null = null;
-    isLoading: boolean = true;
-    isSettingsOpen: boolean = false;
 
-    private subscription: Subscription | null = null;
+    isLoading: boolean = true;
+    isAdmin: boolean = false;
 
     constructor(
         private route: ActivatedRoute,
         private router: Router,
-        private roomService: RoomService,
-        private webSocketService: WebSocketService
+        private dialog: MatDialog,
+        private connectionService: ConnectionService
     ) {}
 
     ngOnInit(): void {
@@ -36,75 +38,55 @@ export class RoomComponent implements OnInit, OnDestroy {
         }
 
         this.joinRoom(roomId);
+    }
 
-        this.subscription = this.roomService.getCurrentRoom().subscribe((room) => {
-            if (room) {
-                this.room = room;
-            } else {
-                this.error = 'Room Not Founded';
-            }
-            this.isLoading = false;
-        });
+    private joinRoom(roomId: string): void {
+        this.connectionService
+            .joinRoom(roomId)
+            .pipe(takeUntil(this.destroy$))
+            .subscribe({
+                next: (room) => {
+                    this.room = room;
+                    this.checkIsAdmin();
+
+                    this.isLoading = false;
+                },
+                error: (error) => {
+                    this.error = error.message || 'Failed to join room';
+                    this.isLoading = false;
+                },
+            });
+    }
+
+    leaveRoom(navigate: boolean = true): void {
+        if (this.room) {
+            this.connectionService.leaveRoom(this.room.uuid);
+        }
+
+        if (navigate) this.router.navigate(['/']);
+    }
+
+    openSettings(): void {
+        if (!this.isAdmin || !this.room) return;
+
+        this.dialog.open(SettingsComponent, { data: this.room });
+    }
+
+    private checkIsAdmin(): void {
+        if (!this.room) {
+            this.isAdmin = false;
+            return;
+        }
+
+        const userId = this.connectionService.userId;
+        const user = this.room.users.find((u) => u.uuid === userId);
+
+        this.isAdmin = user ? user.role === UserRole.ADMIN : false;
     }
 
     ngOnDestroy(): void {
-        this.leaveRoom();
-
-        if (this.subscription) {
-            this.subscription.unsubscribe();
-            this.subscription = null;
-        }
-    }
-
-    joinRoom(roomId: string): void {
-        this.roomService.joinRoom(roomId).subscribe({
-            next: () => {},
-            error: (error) => {
-                this.error = error.message || 'Failed to join room';
-                this.isLoading = false;
-            },
-        });
-    }
-
-    leaveRoom(): void {
-        this.roomService.leaveRoom();
-    }
-
-    exitRoom(): void {
-        this.leaveRoom();
-        this.router.navigate(['/']);
-    }
-
-    toggleSettings(): void {
-        this.isSettingsOpen = !this.isSettingsOpen;
-    }
-
-    get isAdmin(): boolean {
-        if (!this.room) {
-            return false;
-        }
-
-        const userId = this.webSocketService.getUserId();
-        const user = this.room.users.find((u) => u.uuid === userId);
-
-        return user ? user.role === UserRole.ADMIN : false;
-    }
-
-    // !
-    // !
-    // !
-
-    updateContentUrl(url: string): void {
-        this.roomService.updateContentUrl(url).subscribe({
-            next: (success) => {
-                if (!success) {
-                    this.error = 'You do not have permission to change the content';
-                    setTimeout(() => (this.error = null), 3000);
-                }
-            },
-            error: (error) => {
-                this.error = error.message || 'Failed to update content';
-            },
-        });
+        this.leaveRoom(false);
+        this.destroy$.next();
+        this.destroy$.complete();
     }
 }

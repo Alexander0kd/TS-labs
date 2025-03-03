@@ -75,22 +75,28 @@
         }
     }
 }
-.room-layout {
-    display: flex;
-    flex: 1;
-    gap: 20px;
-    overflow: hidden;
-}
-.content-area{
-    flex: 1;
-    overflow: hidden;
-}
-.sidebar{
-    width: 100%;
-    max-width: 300px;
-
+.room-content {
     display: flex;
     flex-direction: column;
+
+    padding-bottom: 20px;
+    height: 100%;
+}
+.room-layout {
+    height: 100%;
+    width: 100%;
+
+    display: flex;
+    flex-direction: row;
+
     gap: 20px;
-    overflow: hidden;
+    padding: 0 20px;
+}
+.content-area{
+    height: 100%;
+    flex: 6.6;
+}
+.sidebar{
+    height: 100%;
+    flex: 3.3;
 }

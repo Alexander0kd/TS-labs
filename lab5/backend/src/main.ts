@@ -4,6 +4,7 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { ConfigService } from '@nestjs/config';
 import { CONFIG } from './app/configuration/configuration.enum';
 import { ValidationPipe } from '@nestjs/common';
+import { SocketIoAdapter } from './app/adapters/socket.io.adapter';
 
 async function bootstrap(): Promise<void> {
     const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -13,6 +14,7 @@ async function bootstrap(): Promise<void> {
         origin: configuration.get<string>(CONFIG.ALLOWED_ORIGINS).split(','),
     });
     app.useGlobalPipes(new ValidationPipe());
+    app.useWebSocketAdapter(new SocketIoAdapter(app, configuration));
 
     if (configuration.get<string>(CONFIG.NODE_ENV) === 'dev') {
         const sw = await import('@nestjs/swagger');

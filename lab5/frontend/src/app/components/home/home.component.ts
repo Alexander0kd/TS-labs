@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { RoomService } from '@app/services/room/room.service';
+import { ConnectionService } from '@app/services/connection/connection.service';
 
 @Component({
     selector: 'app-home',
@@ -15,7 +15,7 @@ export class HomeComponent {
 
     constructor(
         private fb: FormBuilder,
-        private roomService: RoomService,
+        private connectionService: ConnectionService,
         private router: Router
     ) {
         this.createRoomForm = this.fb.group({
@@ -34,9 +34,10 @@ export class HomeComponent {
 
         const { roomName, isPublic } = this.createRoomForm.value;
 
-        this.roomService.createRoom(roomName, isPublic).subscribe({
+        this.connectionService.createRoom(roomName, isPublic).subscribe({
             next: (room) => {
                 this.isCreating = false;
+
                 this.router.navigate(['/room', room.uuid]);
             },
             error: (error) => {

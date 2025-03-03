@@ -1,6 +1,7 @@
 .room-list-container{
     height: 100%;
     width: 100%;
+    background-color: #fff;
 
     display: flex;
     flex-direction: column;
@@ -23,6 +24,10 @@
             gap: 16px;
         }
     }
+}
+.rooms-container {
+    width: 100%;
+    padding: 0 30px 120px 30px;
 }
 .header-title{
     font-size: 36px;
@@ -79,6 +84,7 @@
     font-size: 1.5rem;
 }
 .rooms-grid{
+    width: 100%;
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     gap: 20px;

@@ -1,3 +1,6 @@
+import { ConnectionGateway } from './app/gateways/connection/connection.gateway';
+import { RoomService } from './app/services/room.service';
+import { RoomGateway } from './app/gateways/room/room.gateway';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ConfigurationMapper } from './app/configuration/configuration.mapper';
@@ -14,6 +17,6 @@ import { ConfigurationValidation } from './app/configuration/configuration.valid
         }),
     ],
     controllers: [],
-    providers: [],
+    providers: [ConnectionGateway, RoomService, RoomGateway],
 })
 export class AppModule {}

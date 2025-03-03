@@ -1,46 +1,40 @@
+/* eslint-disable no-console */
 import { Injectable } from '@angular/core';
 import { v4 as uuid } from 'uuid';
-import { webSocket, WebSocketSubject } from 'rxjs/webSocket';
 import { environment } from '@env/environment';
-import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { Observable, Subject, Subscriber } from 'rxjs';
+import { Socket, io } from 'socket.io-client';
 
 @Injectable({
     providedIn: 'root',
 })
 export class WebSocketService {
-    private socket$: WebSocketSubject<unknown> | null = null;
+    private socket: Socket | undefined;
     private userId: string;
-
-    private isConnected$ = new BehaviorSubject<boolean>(false);
 
     constructor() {
         this.userId = this.generateUserId();
     }
 
     connect(): void {
-        if (!this.socket$ || this.socket$.closed) {
-            this.socket$ = webSocket(`${environment.WS_URL}?userId=${this.userId}`);
-
-            this.socket$.subscribe({
-                next: () => this.isConnected$.next(true),
-                error: (err) => {
-                    console.error('WebSocket error:', err);
-                    this.isConnected$.next(false);
-                },
-                complete: () => this.isConnected$.next(false),
+        if (!this.socket || !this.socket.connected) {
+            this.socket = io(environment.API_URL, {
+                query: { userId: this.userId },
+                transports: ['websocket'],
             });
         }
     }
 
     disconnect(): void {
-        if (this.socket$ && !this.socket$.closed) {
-            this.socket$.complete();
+        if (this.socket && this.socket.connected) {
+            this.socket.disconnect();
+            this.socket = undefined;
         }
     }
 
-    send(event: string, data: unknown): void {
-        if (this.socket$ && !this.socket$.closed) {
-            this.socket$.next({ event, data, userId: this.userId });
+    send<T>(event: string, data: T): void {
+        if (this.socket && this.socket.connected) {
+            this.socket.emit(event, { userId: this.userId, data });
         } else {
             console.warn('WebSocket is not connected. Reconnecting...');
             this.connect();
@@ -49,33 +43,61 @@ export class WebSocketService {
     }
 
     listen<T>(event: string): Observable<T> {
+        console.log(`New Sub! \n 🎯 ${event}`);
+
         const subject = new Subject<T>();
 
-        if (this.socket$ && !this.socket$.closed) {
-            this.socket$.subscribe((message: unknown) => {
-                if (
-                    message &&
-                    typeof message === 'object' &&
-                    message !== null &&
-                    'event' in message &&
-                    message.event === event
-                ) {
-                    if ('data' in message) {
-                        subject.next(message.data as T);
-                    }
-                }
+        if (this.socket) {
+            this.socket.on(event, (message: T) => {
+                subject.next(message);
             });
         }
 
         return subject.asObservable();
     }
 
-    isConnected(): Observable<boolean> {
-        return this.isConnected$.asObservable();
+    stopListening(event: string): void {
+        if (this.socket) {
+            console.log(`Sub Destroyed! \n ❌ ${event}`);
+            this.socket.off(event);
+        } else {
+            console.error('WebSocket is not connected.');
+        }
     }
 
     getUserId(): string {
         return this.userId;
+    }
+
+    createTwoSideWSConnection<T, U>(event: string, data: U, listenEvent: string, take: 'ONE' | 'IDENTITY'): Observable<T> {
+        return new Observable<T>((observer: Subscriber<T>) => {
+            this.send<U>(event, data);
+
+            const subscription = this.listen<T>(listenEvent).subscribe({
+                next: (response: T) => {
+                    observer.next(response);
+
+                    if (take === 'ONE') {
+                        // в цьому контексті complete спрацює у того, хто підписався
+                        // оскільки він ще не успів відписатись
+                        observer.complete();
+
+                        subscription.unsubscribe();
+                        this.stopListening(listenEvent);
+                    }
+                },
+                error: (error) => {
+                    observer.error(error);
+                },
+            });
+
+            // Виконується перед відпискою
+            // complete - не спрацює, оскільки ми уже відписались
+            return () => {
+                subscription.unsubscribe();
+                this.stopListening(listenEvent);
+            };
+        });
     }
 
     private generateUserId(): string {
